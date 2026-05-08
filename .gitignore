@@ -4,6 +4,8 @@
 !.env.example
 
 # Frontend
+node_modules/
+.next/
 frontend/node_modules/
 frontend/.next/
 frontend/out/
@@ -20,6 +22,9 @@ frontend/pnpm-debug.log*
 frontend/*.tsbuildinfo
 
 # Backend
+__pycache__/
+venv/
+.venv/
 backend/__pycache__/
 backend/**/*.py[cod]
 backend/*$py.class
@@ -37,6 +42,7 @@ backend/.mypy_cache/
 backend/.ruff_cache/
 backend/.cache/
 backend/*.log
+*.log
 backend/logs/
 backend/htmlcov/
 backend/coverage.xml

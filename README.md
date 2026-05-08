@@ -1,37 +1,91 @@
-# CodeRabbit PR Review Workflow
+# AI Nepal Platform
 
-This repository is configured for CodeRabbit with scoped review instructions for backend, frontend, docs, and GitHub Actions.
+Monorepo foundation for a production-ready AI utility platform for Nepal.
+This baseline includes a runnable Next.js frontend, FastAPI backend, security-first defaults, CI workflows, and planning docs.
 
-## Branch and PR Policy
+## Tech Stack
 
-- Do all development on a feature branch.
-- Open a pull request for every change.
-- Do not push direct commits to `main`.
+- Frontend: Next.js (App Router), TypeScript, Tailwind CSS
+- Backend: FastAPI, Pydantic settings, modular API structure
+- Tooling: pytest, GitHub Actions CI, CodeRabbit PR review
 
-## Typical Workflow
+## Repository Structure
 
-1. Create a feature branch from `main`.
-2. Commit your changes on the feature branch.
-3. Open a pull request to `main`.
-4. Wait for CodeRabbit review comments.
-5. Address feedback and push updates to the same branch.
-6. Merge only after approvals and required checks pass.
+```text
+ai-nepal-platform/
+  frontend/
+  backend/
+  docs/
+  .github/
+  .coderabbit.yaml
+  .gitignore
+  README.md
+  .env.example
+```
 
-## Scope-Specific CodeRabbit Reviews
+## Environment Variables
 
-CodeRabbit uses `.coderabbit.yaml` path instructions to review these areas independently:
+Copy examples and fill values locally. Never commit real secrets.
 
-- `backend/**`: backend/API/data/security focus
-- `frontend/**`: UI/UX/accessibility/TypeScript focus
-- `docs/**`: clarity and correctness focus
-- `.github/workflows/**`: CI security and reliability focus
+- Root example: `.env.example`
+- Backend example: `backend/.env.example`
+- Frontend example: `frontend/.env.example`
 
-## Exclusions
+Root `.env.example` keys:
 
-CodeRabbit review excludes generated/build artifacts, local environments, and sensitive/local-only files, including:
+```env
+DATABASE_URL=
+OPENAI_API_KEY=
+API_V1_PREFIX=/api/v1
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
-- `node_modules`, `.next`, `dist`, `build`, `coverage`
-- `__pycache__`, `.venv`, `.pytest_cache`
-- lock files and environment files (`.env*`)
+## Local Setup: Backend
 
-Do not commit real secrets or `.env` files.
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+Health endpoint:
+
+`GET http://localhost:8000/api/v1/health`
+
+## Local Setup: Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Default app URL:
+
+`http://localhost:3000`
+
+## Branch and PR Workflow
+
+- Create a feature branch from `main` for each task.
+- Open a pull request to `main`.
+- Do not commit directly to `main`.
+- Merge only after CI checks and review are complete.
+
+## CodeRabbit Review Workflow
+
+CodeRabbit is configured via `.coderabbit.yaml` to review repository areas independently:
+
+- `backend/**`: FastAPI architecture, validation, security, reliability
+- `frontend/**`: Next.js quality, accessibility, UX, TypeScript safety
+- `docs/**`: clarity, consistency, and implementation alignment
+- `.github/workflows/**`: CI security and least-privilege checks
+
+Review exclusions include generated artifacts, dependency directories, local env files, and lock/cache files.
+
+## Security Notes
+
+- Never commit real API keys, tokens, passwords, certificates, or `.env` files.
+- Use placeholder/example values only.
+- Keep sensitive configuration in local environment files ignored by git.
