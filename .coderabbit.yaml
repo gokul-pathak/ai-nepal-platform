@@ -1,0 +1,48 @@
+language: "en-US"
+
+reviews:
+  profile: "chill"
+  request_changes_workflow: true
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: true
+
+  path_filters:
+    - "!**/node_modules/**"
+    - "!**/.next/**"
+    - "!**/dist/**"
+    - "!**/build/**"
+    - "!**/__pycache__/**"
+    - "!**/.venv/**"
+    - "!**/coverage/**"
+    - "!**/.pytest_cache/**"
+    - "!**/*.lock"
+    - "!**/package-lock.json"
+    - "!**/pnpm-lock.yaml"
+    - "!**/yarn.lock"
+    - "!**/.env"
+    - "!**/.env.*"
+
+  path_instructions:
+    - path: "backend/**"
+      instructions: |
+        Review as a senior FastAPI backend engineer.
+        Focus on API design, Pydantic validation, SQLAlchemy models, Alembic migration safety,
+        async/sync correctness, security, error handling, logging, and test coverage.
+
+    - path: "frontend/**"
+      instructions: |
+        Review as a senior Next.js frontend engineer.
+        Focus on App Router correctness, TypeScript safety, reusable components,
+        Tailwind consistency, accessibility, responsive layout, API integration, and UX quality.
+
+    - path: "docs/**"
+      instructions: |
+        Review documentation for clarity, completeness, implementation accuracy,
+        onboarding usefulness, and consistency with the actual code.
+
+    - path: ".github/workflows/**"
+      instructions: |
+        Review GitHub Actions for security, least privilege permissions,
+        secret handling, CI correctness, and unnecessary build cost.

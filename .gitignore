@@ -1,0 +1,94 @@
+# Root environment/security
+.env
+.env.*
+!.env.example
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/dist/
+frontend/coverage/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/*.tsbuildinfo
+
+# Backend
+backend/__pycache__/
+backend/**/*.py[cod]
+backend/*$py.class
+backend/.Python
+backend/.python-version
+backend/venv/
+backend/.venv/
+backend/ENV/
+backend/env/
+backend/.env
+backend/.env.*
+!backend/.env.example
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/.cache/
+backend/*.log
+backend/logs/
+backend/htmlcov/
+backend/coverage.xml
+
+# Database/local generated files
+*.db
+*.sqlite
+*.sqlite3
+*.dump.sql
+*.backup.sql
+*_dump.sql
+*_backup.sql
+
+# Alembic/Python migration cache
+backend/alembic/versions/*.pyc
+backend/alembic/versions/__pycache__/
+
+# IDE/editor files
+.vscode/
+.idea/
+.cursor/
+.cursor-cache/
+.cursorrules
+
+# OS files
+.DS_Store
+Thumbs.db
+.Trashes
+
+# Docker/local runtime files
+docker-data/
+*.tar
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Certificates/keys/secrets
+*.pem
+*.key
+*.crt
+*.p12
+secrets/
+credentials/
+
+# Test/build outputs
+coverage/
+test-results/
+
+# Generated files
+*.generated.*
+
+# GitHub Actions local artifacts
+.github/artifacts/
