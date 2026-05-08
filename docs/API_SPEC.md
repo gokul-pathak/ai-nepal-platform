@@ -1,13 +1,15 @@
-# API Specification (Placeholder)
+# API Specification
 
 ## Base Information
 
 - Base path: `/api/v1`
-- Current endpoint: `GET /health`
+- Content type: `application/json`
 
-## Current Endpoint
+## Endpoints
 
 ### GET /api/v1/health
+
+Purpose: service health probe.
 
 Response:
 
@@ -18,12 +20,27 @@ Response:
 }
 ```
 
-## Planned Direction
+### GET /api/v1/tools
 
-- Introduce versioned modules by domain
-- Define request/response models with strict validation
-- Add OpenAPI examples and error conventions
+Purpose: list only active tools.
+
+Response example:
+
+```json
+[
+  {
+    "id": "2ce9e609-2c6b-4ccc-8faa-af78b80f42ff",
+    "slug": "translator",
+    "name": "Translator",
+    "description": "Placeholder description for Translator.",
+    "category": "language",
+    "is_active": true,
+    "created_at": "2026-05-08T07:00:00.000000Z",
+    "updated_at": "2026-05-08T07:00:00.000000Z"
+  }
+]
+```
 
 ## Notes
 
-Business endpoints are intentionally deferred.
+- Auth, sponsor, admin action, and AI execution APIs are intentionally not implemented in this phase.
