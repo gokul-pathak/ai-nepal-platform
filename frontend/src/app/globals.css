@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 42 33% 97%;
+  --foreground: 28 26% 15%;
+  --muted: 38 24% 92%;
+  --muted-foreground: 25 15% 38%;
+  --border: 32 22% 84%;
+  --input: 32 22% 84%;
+  --ring: 26 63% 45%;
+  --primary: 26 63% 45%;
+  --primary-foreground: 40 60% 98%;
+  --radius: 0.75rem;
+}
+
+body {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(230, 178, 109, 0.22), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(94, 158, 117, 0.2), transparent 34%),
+    hsl(var(--background));
+  color: hsl(var(--foreground));
+}
