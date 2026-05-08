@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-4.1-mini"
     gemini_api_key: str = ""
     gemini_model: str = "gemini-1.5-flash"
+    cors_origins: str = (
+        "http://localhost:3000,http://127.0.0.1:3000,"
+        "http://localhost:3001,http://127.0.0.1:3001"
+    )
 
     model_config = SettingsConfigDict(
         env_file=".env",
