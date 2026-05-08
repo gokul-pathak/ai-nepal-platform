@@ -11,3 +11,7 @@ class ToolRepository:
     def list_active(self) -> list[Tool]:
         stmt = select(Tool).where(Tool.is_active.is_(True)).order_by(Tool.created_at.asc())
         return list(self.db.scalars(stmt).all())
+
+    def get_by_slug(self, slug: str) -> Tool | None:
+        stmt = select(Tool).where(Tool.slug == slug)
+        return self.db.scalar(stmt)
