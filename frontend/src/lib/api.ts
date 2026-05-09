@@ -184,7 +184,6 @@ export async function createSponsorLead(payload: SponsorLeadRequest): Promise<Sp
 }
 
 export async function getAdminMetrics(adminApiKey: string): Promise<AdminMetricsResponse> {
-  "use server";
   if (!adminApiKey.trim()) {
     throw new Error("Admin API key is required");
   }
