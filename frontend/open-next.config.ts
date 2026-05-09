@@ -1,5 +1,5 @@
 
-import { defineOpenNextConfig } from 'open-next/config';
+import { defineOpenNextConfig } from 'open-next/dist/config';
 
 export default defineOpenNextConfig({
   default: {
