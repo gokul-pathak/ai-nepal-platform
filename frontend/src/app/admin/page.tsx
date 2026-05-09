@@ -69,7 +69,11 @@ export default function AdminPage() {
         </div>
 
         <form className="mt-5 flex flex-wrap gap-3" onSubmit={handleSubmit}>
+          <label htmlFor="admin-api-key" className="sr-only">
+            Admin API key
+          </label>
           <input
+            id="admin-api-key"
             type="password"
             value={adminKey}
             onChange={(event) => setAdminKey(event.target.value)}
