@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Nepal-inspired flag icon">
+  <path d="M20 8 L20 88 L70 56 L45 44 L70 32 Z" fill="#003893"/>
+  <path d="M24 12 L24 82 L64 56 L39 44 L64 32 Z" fill="#DC143C"/>
+  <circle cx="43" cy="28" r="7" fill="#fff"/>
+  <circle cx="44" cy="60" r="10" fill="#fff"/>
+  <circle cx="44" cy="57" r="8" fill="#DC143C"/>
+  <path d="M44 66 L46 70 L50 70 L47 73 L48 77 L44 75 L40 77 L41 73 L38 70 L42 70 Z" fill="#fff"/>
+</svg>

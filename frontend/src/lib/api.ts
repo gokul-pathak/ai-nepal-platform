@@ -30,7 +30,9 @@ function buildUrl(path: string): string {
 }
 
 export async function getTools(): Promise<Tool[]> {
-  const response = await fetch(buildUrl("/api/v1/tools"), { cache: "no-store" });
+  const response = await fetch(buildUrl("/api/v1/tools"), {
+    next: { revalidate: 60 },
+  });
   if (!response.ok) {
     throw new Error("Failed to load tools");
   }

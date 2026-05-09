@@ -11,6 +11,11 @@ const notoSans = Noto_Sans({
 export const metadata: Metadata = {
   title: "AI Nepal Platform",
   description: "Monorepo foundation for AI tools built for Nepal.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
