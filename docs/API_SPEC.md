@@ -82,7 +82,7 @@ Request body:
 }
 ```
 
-Success response:
+Success response (HTTP 200):
 
 ```json
 {
@@ -90,6 +90,28 @@ Success response:
   "message": "Sponsor interest submitted successfully"
 }
 ```
+
+Validation error response (HTTP 422):
+
+```json
+{
+  "detail": [
+    {
+      "type": "value_error",
+      "loc": ["body", "email"],
+      "msg": "Value error, Invalid email address",
+      "input": "invalid@@email.com"
+    }
+  ]
+}
+```
+
+Response fields:
+- `detail`: Array of validation error objects
+- `type`: Error type identifier (e.g., "value_error", "missing", "string_too_short")
+- `loc`: Location of the error as an array (e.g., ["body", "field_name"])
+- `msg`: Human-readable error message
+- `input`: The invalid input value that caused the error
 
 ## Notes
 

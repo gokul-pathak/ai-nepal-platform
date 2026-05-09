@@ -18,7 +18,11 @@ class SponsorRepository:
         return list(self.db.scalars(stmt).all())
 
     def create_lead(self, lead: SponsorLead) -> SponsorLead:
-        self.db.add(lead)
-        self.db.commit()
-        self.db.refresh(lead)
-        return lead
+        try:
+            self.db.add(lead)
+            self.db.commit()
+            self.db.refresh(lead)
+            return lead
+        except Exception:
+            self.db.rollback()
+            raise

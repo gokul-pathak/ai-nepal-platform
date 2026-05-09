@@ -32,8 +32,24 @@ class SponsorLeadCreateRequest(BaseModel):
     @classmethod
     def validate_email(cls, value: str) -> str:
         normalized = value.strip()
-        if "@" not in normalized or normalized.startswith("@") or normalized.endswith("@"):
+
+        # Reject any input with whitespace
+        if " " in normalized or "\t" in normalized or "\n" in normalized:
             raise ValueError("Invalid email address")
+
+        # Ensure exactly one "@" character
+        if normalized.count("@") != 1:
+            raise ValueError("Invalid email address")
+
+        # Split and ensure local and domain parts are non-empty
+        local, domain = normalized.split("@")
+        if not local or not domain:
+            raise ValueError("Invalid email address")
+
+        # Ensure domain contains at least one "." not at start or end
+        if "." not in domain or domain.startswith(".") or domain.endswith("."):
+            raise ValueError("Invalid email address")
+
         return normalized
 
 
