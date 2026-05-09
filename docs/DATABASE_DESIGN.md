@@ -92,3 +92,11 @@ Seeded slugs:
 - `form-helper`
 - `agriculture-helper`
 - `legal-basic-helper`
+
+Seed sponsor packages (from backend directory):
+
+```bash
+cd backend && python scripts/seed_sponsor_packages.py
+```
+
+Note: All seed commands must be run from the `backend` directory as the working directory, or use the full path from repository root: `python backend/scripts/seed_sponsor_packages.py`.
