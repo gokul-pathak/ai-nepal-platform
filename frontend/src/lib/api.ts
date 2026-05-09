@@ -50,6 +50,40 @@ export type SponsorLeadResponse = {
   message: string;
 };
 
+export type UsageCountByTool = {
+  tool_slug: string;
+  count: number;
+};
+
+export type LatestSponsorLead = {
+  organization_name: string;
+  contact_name: string;
+  status: string;
+  created_at: string;
+};
+
+export type LatestToolUsageRecord = {
+  tool_slug: string;
+  language: string | null;
+  status: string;
+  created_at: string;
+};
+
+export type AdminMetricsResponse = {
+  total_tool_usage_count: number;
+  total_users_helped: number;
+  usage_count_by_tool: UsageCountByTool[];
+  sponsor_lead_count: number;
+  latest_sponsor_leads: LatestSponsorLead[];
+  latest_tool_usage_records: LatestToolUsageRecord[];
+};
+
+export type PublicMetricsResponse = {
+  total_requests: number;
+  total_users_helped: number;
+  total_sponsor_leads: number;
+};
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 const SESSION_KEY = "ai_nepal_session_id";
 
@@ -147,4 +181,36 @@ export async function createSponsorLead(payload: SponsorLeadRequest): Promise<Sp
   }
 
   return response.json() as Promise<SponsorLeadResponse>;
+}
+
+export async function getAdminMetrics(adminApiKey: string): Promise<AdminMetricsResponse> {
+  const response = await fetch(buildUrl("/api/v1/admin/metrics"), {
+    cache: "no-store",
+    headers: {
+      "X-Admin-API-Key": adminApiKey,
+    },
+  });
+  if (!response.ok) {
+    let detail = "Failed to load admin metrics";
+    try {
+      const body = (await response.json()) as { detail?: string };
+      if (body.detail) {
+        detail = body.detail;
+      }
+    } catch {
+      detail = "Failed to load admin metrics";
+    }
+    throw new Error(detail);
+  }
+  return response.json() as Promise<AdminMetricsResponse>;
+}
+
+export async function getPublicMetrics(): Promise<PublicMetricsResponse> {
+  const response = await fetch(buildUrl("/api/v1/metrics/public"), {
+    next: { revalidate: 60 },
+  });
+  if (!response.ok) {
+    throw new Error("Failed to load public metrics");
+  }
+  return response.json() as Promise<PublicMetricsResponse>;
 }

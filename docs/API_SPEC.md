@@ -113,7 +113,73 @@ Response fields:
 - `msg`: Human-readable error message
 - `input`: The invalid input value that caused the error
 
+### GET /api/v1/metrics/public
+
+Purpose: provide public impact counters.
+
+Security notes:
+
+- Public response includes aggregated counts only.
+- No sponsor emails, phone numbers, session IDs, IP hashes, or raw user input are exposed.
+
+Response example:
+
+```json
+{
+  "total_requests": 1520,
+  "total_users_helped": 423,
+  "total_sponsor_leads": 17
+}
+```
+
+### GET /api/v1/admin/metrics
+
+Purpose: provide basic admin dashboard metrics.
+
+Authentication:
+
+- Required header: `X-Admin-API-Key: <ADMIN_API_KEY>`
+- If missing/invalid: HTTP `401`
+- If server key not configured: HTTP `503`
+
+Response example:
+
+```json
+{
+  "total_tool_usage_count": 1520,
+  "total_users_helped": 423,
+  "usage_count_by_tool": [
+    {
+      "tool_slug": "translator",
+      "count": 900
+    },
+    {
+      "tool_slug": "form-helper",
+      "count": 350
+    }
+  ],
+  "sponsor_lead_count": 17,
+  "latest_sponsor_leads": [
+    {
+      "organization_name": "Kathmandu Tech Initiative",
+      "contact_name": "Asha Rana",
+      "status": "new",
+      "created_at": "2026-05-09T08:00:00.000000Z"
+    }
+  ],
+  "latest_tool_usage_records": [
+    {
+      "tool_slug": "translator",
+      "language": "en",
+      "status": "success",
+      "created_at": "2026-05-09T08:05:00.000000Z"
+    }
+  ]
+}
+```
+
 ## Notes
 
 - Sponsor listing and lead submission are included for MVP.
-- Auth, payments, invoices, sponsor dashboard, and billing automation are not part of this phase.
+- Basic admin/public metrics endpoints are included for MVP visibility.
+- Auth, role permissions, export reports, charts libraries, payments, and sponsor dashboard are not part of this phase.

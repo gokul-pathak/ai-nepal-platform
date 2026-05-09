@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     gemini_model: str = "gemini-1.5-flash"
     allowed_origins: str = ""
+    admin_api_key: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",
