@@ -92,3 +92,9 @@ Seeded slugs:
 - `form-helper`
 - `agriculture-helper`
 - `legal-basic-helper`
+
+Seed sponsor packages:
+
+```bash
+python scripts/seed_sponsor_packages.py
+```

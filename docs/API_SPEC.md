@@ -41,6 +41,57 @@ Response example:
 ]
 ```
 
+### GET /api/v1/sponsors/packages
+
+Purpose: return active sponsor packages.
+
+Response example:
+
+```json
+[
+  {
+    "id": "ab74af8f-4bfe-41c3-a55f-0f4cf13f9e2e",
+    "name": "Bronze",
+    "slug": "bronze",
+    "monthly_request_limit": 5000,
+    "price_label": "Starter sponsorship",
+    "description": "Sponsor basic user AI credits for local communities.",
+    "is_active": true,
+    "created_at": "2026-05-09T08:00:00.000000Z",
+    "updated_at": "2026-05-09T08:00:00.000000Z"
+  }
+]
+```
+
+### POST /api/v1/sponsors/leads
+
+Purpose: submit sponsor interest lead.
+
+Request body:
+
+```json
+{
+  "organization_name": "Kathmandu Tech Initiative",
+  "contact_name": "Asha Rana",
+  "email": "asha@example.com",
+  "phone": "+977-9800000000",
+  "sponsor_type": "district program",
+  "budget_range": "5k-10k USD",
+  "target_group": "public schools",
+  "message": "Interested in silver package"
+}
+```
+
+Success response:
+
+```json
+{
+  "id": "d2b95cc9-8bf6-4738-b39a-8e3bfe59eb8e",
+  "message": "Sponsor interest submitted successfully"
+}
+```
+
 ## Notes
 
-- Auth, sponsor, admin action, and AI execution APIs are intentionally not implemented in this phase.
+- Sponsor listing and lead submission are included for MVP.
+- Auth, payments, invoices, sponsor dashboard, and billing automation are not part of this phase.
