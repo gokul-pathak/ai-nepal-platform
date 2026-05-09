@@ -18,12 +18,14 @@
 - Tools catalog and execution workflows
 - Sponsor management surfaces
 - Admin control foundations
+- MVP metrics visibility (public impact and admin usage summaries)
 
 ## Phase 3: Reliability and Scale
 
 - Observability enhancements
 - Performance tuning and caching
 - Release and rollback procedures
+- Authenticated admin analytics with role-based access
 
 ## Notes
 

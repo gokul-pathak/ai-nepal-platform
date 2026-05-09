@@ -1,12 +1,22 @@
 import Link from "next/link";
 
+import { getPublicMetrics } from "@/lib/api";
+
 const cards = [
   { href: "/tools", title: "Tools", body: "Explore upcoming AI utilities for Nepal." },
   { href: "/sponsors", title: "Sponsors", body: "See sponsorship model and partner direction." },
   { href: "/admin", title: "Admin", body: "Internal operations dashboard placeholder." },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  let metrics: { total_requests: number; total_users_helped: number; total_sponsor_leads: number } | null = null;
+
+  try {
+    metrics = await getPublicMetrics();
+  } catch {
+    metrics = null;
+  }
+
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-12 md:px-10">
       <section className="relative overflow-hidden rounded-2xl border border-border/70 bg-white/75 p-8 shadow-sm backdrop-blur-sm md:p-12">
@@ -40,6 +50,32 @@ export default function HomePage() {
             <p className="mt-2 text-sm text-muted-foreground">{card.body}</p>
           </Link>
         ))}
+      </section>
+
+      <section className="mt-8 rounded-2xl border border-border/80 bg-white/85 p-6 shadow-sm md:p-8">
+        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Public Impact</p>
+        <h2 className="mt-2 text-2xl font-semibold md:text-3xl">Platform Snapshot</h2>
+
+        {metrics ? (
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <article className="rounded-xl border border-border/70 bg-white px-4 py-4">
+              <p className="text-sm text-muted-foreground">Total requests</p>
+              <p className="mt-2 text-2xl font-semibold">{metrics.total_requests.toLocaleString()}</p>
+            </article>
+            <article className="rounded-xl border border-border/70 bg-white px-4 py-4">
+              <p className="text-sm text-muted-foreground">Users helped</p>
+              <p className="mt-2 text-2xl font-semibold">{metrics.total_users_helped.toLocaleString()}</p>
+            </article>
+            <article className="rounded-xl border border-border/70 bg-white px-4 py-4">
+              <p className="text-sm text-muted-foreground">Sponsor interests</p>
+              <p className="mt-2 text-2xl font-semibold">{metrics.total_sponsor_leads.toLocaleString()}</p>
+            </article>
+          </div>
+        ) : (
+          <p className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-700">
+            Metrics are temporarily unavailable. Please check backend connectivity.
+          </p>
+        )}
       </section>
     </main>
   );
