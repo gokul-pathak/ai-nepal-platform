@@ -65,6 +65,7 @@ def test_public_metrics_response() -> None:
 
 def test_admin_metrics_response() -> None:
     client, testing_session_local, engine, db_path = _build_test_client()
+    original_admin_api_key = settings.admin_api_key
 
     try:
         with testing_session_local() as db:
@@ -95,6 +96,7 @@ def test_admin_metrics_response() -> None:
         assert "email" not in payload["latest_sponsor_leads"][0]
         assert "session_id" not in payload["latest_tool_usage_records"][0]
     finally:
+        settings.admin_api_key = original_admin_api_key
         client.close()
         engine.dispose()
         app.dependency_overrides.clear()
@@ -104,12 +106,14 @@ def test_admin_metrics_response() -> None:
 
 def test_admin_metrics_requires_api_key() -> None:
     client, _, engine, db_path = _build_test_client()
+    original_admin_api_key = settings.admin_api_key
 
     try:
         settings.admin_api_key = f"test-{uuid.uuid4()}"
         response = client.get("/api/v1/admin/metrics")
         assert response.status_code == 401
     finally:
+        settings.admin_api_key = original_admin_api_key
         client.close()
         engine.dispose()
         app.dependency_overrides.clear()

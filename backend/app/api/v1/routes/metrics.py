@@ -1,3 +1,5 @@
+import hmac
+
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -27,7 +29,7 @@ def get_admin_metrics(
             detail="Admin metrics not configured",
         )
 
-    if x_admin_api_key != settings.admin_api_key:
+    if not hmac.compare_digest(x_admin_api_key or "", settings.admin_api_key or ""):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid admin API key")
 
     service = MetricsService(db)
