@@ -19,7 +19,7 @@ class ToolResponse(BaseModel):
 
 
 class ToolRunRequest(BaseModel):
-    input: str = Field(min_length=1, max_length=4000)
+    input: str = Field(max_length=4000)
     language: str = Field(default="en", min_length=2, max_length=8)
 
 

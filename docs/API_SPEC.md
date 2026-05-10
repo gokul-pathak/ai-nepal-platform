@@ -41,6 +41,44 @@ Response example:
 ]
 ```
 
+### POST /api/v1/tools/{tool_slug}/run
+
+Purpose: execute a tool prompt using configured AI provider.
+
+Headers:
+
+- Required header: `X-Session-ID: <session_id>`
+
+Request body:
+
+```json
+{
+  "input": "Translate this to Nepali",
+  "language": "ne"
+}
+```
+
+Success response (HTTP 200):
+
+```json
+{
+  "tool": "translator",
+  "result": "...generated content...",
+  "usage": {
+    "remaining_daily_requests": 4
+  }
+}
+```
+
+Error responses:
+
+- `400`: missing session header, blank input, or blocked instruction pattern
+- `401`: reserved for protected endpoints
+- `404`: tool not found
+- `429`: daily free usage limit reached
+- `500`: internal server error
+- `502`: upstream AI provider request failed
+
 ### GET /api/v1/sponsors/packages
 
 Purpose: return active sponsor packages.
@@ -138,6 +176,7 @@ Purpose: provide basic admin dashboard metrics.
 
 Authentication:
 
+- Applies to all `/api/v1/admin/*` routes.
 - Required header: `X-Admin-API-Key: <ADMIN_API_KEY>`
 - If missing/invalid: HTTP `401`
 - If server key not configured: HTTP `503`

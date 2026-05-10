@@ -163,6 +163,29 @@ def test_run_tool_empty_input() -> None:
             headers={"X-Session-ID": "session-3"},
             json={"input": "", "language": "en"},
         )
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Input cannot be empty"
+    finally:
+        client.close()
+        engine.dispose()
+        app.dependency_overrides.clear()
+        if os.path.exists(db_path):
+            os.remove(db_path)
+
+
+def test_run_tool_input_too_large() -> None:
+    client, testing_session_local, engine, db_path = _build_test_client()
+
+    try:
+        with testing_session_local() as db:
+            db.add(Tool(slug="translator", name="Translator", is_active=True))
+            db.commit()
+
+        response = client.post(
+            "/api/v1/tools/translator/run",
+            headers={"X-Session-ID": "session-size"},
+            json={"input": "a" * 4001, "language": "en"},
+        )
         assert response.status_code == 422
     finally:
         client.close()

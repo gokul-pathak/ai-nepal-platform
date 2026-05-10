@@ -49,6 +49,13 @@ export default function AdminPage() {
     await loadMetrics(adminKey.trim());
   }
 
+  function handleLogout() {
+    sessionStorage.removeItem(ADMIN_KEY_STORAGE);
+    setAdminKey("");
+    setMetrics(null);
+    setError("");
+  }
+
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-10 md:px-10">
       <section className="rounded-2xl border border-border/70 bg-white/85 p-6 shadow-sm md:p-8">
@@ -86,6 +93,13 @@ export default function AdminPage() {
             className="rounded-lg bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-[hsl(var(--primary-foreground))] disabled:opacity-60"
           >
             {loading ? "Loading..." : "Load metrics"}
+          </button>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded-lg border border-border bg-white px-4 py-2 text-sm font-medium text-muted-foreground"
+          >
+            Clear key
           </button>
         </form>
 

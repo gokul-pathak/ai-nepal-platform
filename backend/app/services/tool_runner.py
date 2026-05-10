@@ -68,6 +68,8 @@ class ToolRunnerService:
     @staticmethod
     def _sanitize_input(user_input: str) -> str:
         normalized = " ".join(user_input.strip().split())
+        if not normalized:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Input cannot be empty")
         lowered = normalized.lower()
         blocked_patterns = ["ignore previous instructions", "reveal system prompt", "developer message"]
         if any(pattern in lowered for pattern in blocked_patterns):

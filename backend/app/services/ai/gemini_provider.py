@@ -23,8 +23,8 @@ class GeminiProvider(AIProvider):
             response = self.client.models.generate_content(model=settings.gemini_model, contents=full_prompt)
             return (response.text or "").strip()
         except Exception as exc:
-            logger.exception(
+            logger.error(
                 "AI provider request failed",
-                extra={"provider": "gemini", "error_message": str(exc)},
+                extra={"provider": "gemini", "error_type": exc.__class__.__name__},
             )
             raise

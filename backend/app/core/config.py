@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-4.1-mini"
     gemini_api_key: str = ""
     gemini_model: str = "gemini-1.5-flash"
+    backend_cors_origins: str = ""
     allowed_origins: str = ""
     admin_api_key: str = ""
 

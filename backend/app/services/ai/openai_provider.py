@@ -28,8 +28,8 @@ class OpenAIProvider(AIProvider):
             )
             return response.output_text.strip()
         except Exception as exc:
-            logger.exception(
+            logger.error(
                 "AI provider request failed",
-                extra={"provider": "openai", "error_message": str(exc)},
+                extra={"provider": "openai", "error_type": exc.__class__.__name__},
             )
             raise
