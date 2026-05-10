@@ -2,7 +2,7 @@
 
 ## Current MVP Controls
 
-- Admin API protection: all `/api/v1/admin/*` endpoints require `X-Admin-API-Key` and return `401` for missing/invalid keys.
+- Admin API protection: all `/api/v1/admin/*` endpoints require `X-Admin-API-Key` and return `401` for missing/invalid keys, or `503` when the admin key is not configured.
 - Public metrics data minimization: `/api/v1/metrics/public` returns aggregated counters only.
 - Input validation: tool run input is length-limited, rejects blank payloads, and blocks prompt-injection phrases.
 - Usage abuse control: free usage is capped per session with `429` response on limit exceed.

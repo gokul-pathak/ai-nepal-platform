@@ -75,6 +75,7 @@ Error responses:
 - `400`: missing session header, blank input, or blocked instruction pattern
 - `401`: reserved for protected endpoints
 - `404`: tool not found
+- `422`: validation error (e.g., oversized input exceeding length limit, or schema validation failures)
 - `429`: daily free usage limit reached
 - `500`: internal server error
 - `502`: upstream AI provider request failed

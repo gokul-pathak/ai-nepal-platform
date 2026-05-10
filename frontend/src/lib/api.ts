@@ -183,7 +183,7 @@ export async function createSponsorLead(payload: SponsorLeadRequest): Promise<Sp
   return response.json() as Promise<SponsorLeadResponse>;
 }
 
-export async function getAdminMetrics(adminApiKey: string): Promise<AdminMetricsResponse> {
+export async function getAdminMetrics(adminApiKey: string, signal?: AbortSignal): Promise<AdminMetricsResponse> {
   if (!adminApiKey.trim()) {
     throw new Error("Admin API key is required");
   }
@@ -192,6 +192,7 @@ export async function getAdminMetrics(adminApiKey: string): Promise<AdminMetrics
     headers: {
       "X-Admin-API-Key": adminApiKey,
     },
+    signal,
   });
   if (!response.ok) {
     let detail = "Failed to load admin metrics";
