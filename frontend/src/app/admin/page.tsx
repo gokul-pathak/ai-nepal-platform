@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import { AdminMetricsResponse, getAdminMetrics } from "@/lib/api";
@@ -16,6 +16,7 @@ export default function AdminPage() {
   const [metrics, setMetrics] = useState<AdminMetricsResponse | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const metricsAbortCtrlRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     const saved = sessionStorage.getItem(ADMIN_KEY_STORAGE);
@@ -25,16 +26,32 @@ export default function AdminPage() {
   }, []);
 
   async function loadMetrics(key: string) {
+    if (metricsAbortCtrlRef.current) {
+      metricsAbortCtrlRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    metricsAbortCtrlRef.current = controller;
+
     setLoading(true);
     setError("");
     try {
-      const payload = await getAdminMetrics(key);
-      setMetrics(payload);
+      const payload = await getAdminMetrics(key, controller.signal);
+      if (!controller.signal.aborted) {
+        setMetrics(payload);
+      }
     } catch (err) {
-      setMetrics(null);
-      setError(err instanceof Error ? err.message : "Failed to load metrics");
+      if (err instanceof Error && err.name === "AbortError") {
+        return;
+      }
+      if (!controller.signal.aborted) {
+        setMetrics(null);
+        setError(err instanceof Error ? err.message : "Failed to load metrics");
+      }
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+      }
     }
   }
 
@@ -47,6 +64,16 @@ export default function AdminPage() {
 
     sessionStorage.setItem(ADMIN_KEY_STORAGE, adminKey.trim());
     await loadMetrics(adminKey.trim());
+  }
+
+  function handleLogout() {
+    if (metricsAbortCtrlRef.current) {
+      metricsAbortCtrlRef.current.abort();
+    }
+    sessionStorage.removeItem(ADMIN_KEY_STORAGE);
+    setAdminKey("");
+    setMetrics(null);
+    setError("");
   }
 
   return (
@@ -86,6 +113,13 @@ export default function AdminPage() {
             className="rounded-lg bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-[hsl(var(--primary-foreground))] disabled:opacity-60"
           >
             {loading ? "Loading..." : "Load metrics"}
+          </button>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded-lg border border-border bg-white px-4 py-2 text-sm font-medium text-muted-foreground"
+          >
+            Clear key
           </button>
         </form>
 

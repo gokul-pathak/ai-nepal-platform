@@ -112,6 +112,12 @@ def test_admin_metrics_requires_api_key() -> None:
         settings.admin_api_key = f"test-{uuid.uuid4()}"
         response = client.get("/api/v1/admin/metrics")
         assert response.status_code == 401
+
+        invalid_response = client.get(
+            "/api/v1/admin/metrics",
+            headers={"X-Admin-API-Key": "invalid-key"},
+        )
+        assert invalid_response.status_code == 401
     finally:
         settings.admin_api_key = original_admin_api_key
         client.close()
