@@ -22,3 +22,21 @@ body {
     hsl(var(--background));
   color: hsl(var(--foreground));
 }
+
+a,
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  min-height: 2.75rem;
+}
+
+textarea {
+  min-height: 7rem;
+}

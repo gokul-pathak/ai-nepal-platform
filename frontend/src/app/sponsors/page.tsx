@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 
 import { createSponsorLead, getSponsorPackages, SponsorPackage } from "@/lib/api";
+import { StateMessage } from "@/components/state-message";
 
 type FormState = {
   organization_name: string;
@@ -27,6 +28,19 @@ const INITIAL_FORM: FormState = {
   message: "",
 };
 
+function toFriendlyFormError(err: unknown): string {
+  if (err instanceof TypeError) {
+    return "Service is temporarily unavailable. Please try again shortly.";
+  }
+  if (err instanceof Error) {
+    if (err.message.toLowerCase().includes("email")) {
+      return "Please check the email address and try again.";
+    }
+    return "We could not submit your request right now. Please try again.";
+  }
+  return "We could not submit your request right now. Please try again.";
+}
+
 export default function SponsorsPage() {
   const [packages, setPackages] = useState<SponsorPackage[]>([]);
   const [loadingPackages, setLoadingPackages] = useState(true);
@@ -44,8 +58,8 @@ export default function SponsorsPage() {
       try {
         const data = await getSponsorPackages();
         setPackages(data);
-      } catch (err) {
-        setPackageError(err instanceof Error ? err.message : "Failed to load sponsor packages");
+      } catch {
+        setPackageError("Sponsor packages are temporarily unavailable.");
       } finally {
         setLoadingPackages(false);
       }
@@ -99,14 +113,14 @@ export default function SponsorsPage() {
       setSuccessMessage(response.message);
       setForm(INITIAL_FORM);
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Failed to submit sponsor interest");
+      setFormError(toFriendlyFormError(err));
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-10 md:px-10">
+    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-5 py-8 md:px-10 md:py-10">
       <section className="rounded-2xl border border-border/70 bg-white/80 p-6 shadow-sm md:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -133,7 +147,7 @@ export default function SponsorsPage() {
         <h2 className="text-2xl font-semibold">Sponsorship Packages</h2>
         <p className="mt-2 text-sm text-muted-foreground">Choose a tier that fits your impact goals.</p>
 
-        {packageError ? <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{packageError}</p> : null}
+        {packageError ? <div className="mt-4"><StateMessage tone="warning" message={packageError} /></div> : null}
 
         <div className="mt-5 grid gap-4 md:grid-cols-3">
           {loadingPackages
@@ -159,6 +173,12 @@ export default function SponsorsPage() {
                 </article>
               ))}
         </div>
+
+        {!loadingPackages && !packageError && packages.length === 0 ? (
+          <div className="mt-4">
+            <StateMessage tone="info" message="No sponsor packages are listed yet. Please check back soon." />
+          </div>
+        ) : null}
       </section>
 
       <section className="mt-8 rounded-2xl border border-border/70 bg-white/85 p-6 shadow-sm md:p-8">
@@ -249,7 +269,7 @@ export default function SponsorsPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="rounded-lg bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-[hsl(var(--primary-foreground))] disabled:cursor-not-allowed disabled:opacity-60"
+              className="min-h-11 rounded-lg bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-[hsl(var(--primary-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? "Submitting..." : "Submit interest"}
             </button>

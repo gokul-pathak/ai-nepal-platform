@@ -1,14 +1,23 @@
 import Link from "next/link";
 
 import { getTools } from "@/lib/api";
+import { StateMessage } from "@/components/state-message";
+import { ToolCard } from "@/components/tool-card";
 
 export const runtime = "edge";
 
 export default async function ToolsPage() {
-  const tools = await getTools();
+  let tools: Awaited<ReturnType<typeof getTools>> = [];
+  let loadFailed = false;
+
+  try {
+    tools = await getTools();
+  } catch {
+    loadFailed = true;
+  }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-10 md:px-10">
+    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-5 py-8 md:px-10 md:py-10">
       <header className="rounded-2xl border border-border/70 bg-white/70 p-6 shadow-sm backdrop-blur-sm md:p-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -27,21 +36,29 @@ export default async function ToolsPage() {
         </p>
       </header>
 
-      <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {tools.map((tool) => (
-          <Link
-            key={tool.id}
-            href={`/tools/${tool.slug}`}
-            className="group rounded-2xl border border-border/80 bg-white/85 p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-          >
-            <h2 className="text-xl font-semibold group-hover:text-[hsl(var(--primary))]">{tool.name}</h2>
-            <p className="mt-2 text-xs uppercase tracking-wide text-muted-foreground">{tool.slug}</p>
-            <p className="mt-3 text-sm text-muted-foreground">
-              {tool.description ?? "Run this tool to generate AI-assisted output."}
-            </p>
-            <p className="mt-5 text-sm font-medium text-[hsl(var(--primary))]">Open workspace</p>
-          </Link>
-        ))}
+      <section className="mt-8" aria-live="polite">
+        {loadFailed ? (
+          <StateMessage tone="warning" message="Tools are temporarily unavailable. Please refresh in a moment." />
+        ) : null}
+
+        {!loadFailed && tools.length === 0 ? (
+          <StateMessage tone="info" message="No tools are available right now. Please check again soon." />
+        ) : null}
+
+        {tools.length > 0 ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {tools.map((tool) => (
+              <ToolCard
+                key={tool.id}
+                href={`/tools/${tool.slug}`}
+                title={tool.name}
+                slug={tool.slug}
+                description={tool.description ?? "Run this tool to generate AI-assisted output."}
+                ctaLabel="Open workspace"
+              />
+            ))}
+          </div>
+        ) : null}
       </section>
     </main>
   );
