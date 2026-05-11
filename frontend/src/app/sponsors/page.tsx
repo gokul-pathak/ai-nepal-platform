@@ -5,7 +5,6 @@ import Link from "next/link";
 
 import { createSponsorLead, getSponsorPackages, SponsorPackage } from "@/lib/api";
 import { StateMessage } from "@/components/state-message";
-import { useI18n } from "@/i18n/hooks/use-i18n";
 
 type FormState = {
   organization_name: string;
@@ -29,21 +28,20 @@ const INITIAL_FORM: FormState = {
   message: "",
 };
 
-function toFriendlyFormError(err: unknown, t: (key: string) => string): string {
+function toFriendlyFormError(err: unknown): string {
   if (err instanceof TypeError) {
-    return t("sponsors.errors.service");
+    return "Service is temporarily unavailable. Please try again shortly.";
   }
   if (err instanceof Error) {
     if (err.message.toLowerCase().includes("email")) {
-      return t("sponsors.errors.emailCheck");
+      return "Please check the email address and try again.";
     }
-    return t("sponsors.errors.generic");
+    return "We could not submit your request right now. Please try again.";
   }
-  return t("sponsors.errors.generic");
+  return "We could not submit your request right now. Please try again.";
 }
 
 export default function SponsorsPage() {
-  const { t } = useI18n();
   const [packages, setPackages] = useState<SponsorPackage[]>([]);
   const [loadingPackages, setLoadingPackages] = useState(true);
   const [packageError, setPackageError] = useState("");
@@ -54,31 +52,21 @@ export default function SponsorsPage() {
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    let active = true;
     async function loadPackages() {
       setLoadingPackages(true);
       setPackageError("");
       try {
         const data = await getSponsorPackages();
-        if (active) {
-          setPackages(data);
-        }
+        setPackages(data);
       } catch {
-        if (active) {
-          setPackageError(t("sponsors.packagesUnavailable"));
-        }
+        setPackageError("Sponsor packages are temporarily unavailable.");
       } finally {
-        if (active) {
-          setLoadingPackages(false);
-        }
+        setLoadingPackages(false);
       }
     }
 
     void loadPackages();
-    return () => {
-      active = false;
-    };
-  }, [t]);
+  }, []);
 
   function setField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -86,13 +74,13 @@ export default function SponsorsPage() {
 
   function validateForm(): string | null {
     if (form.organization_name.trim().length < 2) {
-      return t("sponsors.errors.organization");
+      return "Organization name is required.";
     }
     if (form.contact_name.trim().length < 2) {
-      return t("sponsors.errors.contact");
+      return "Contact name is required.";
     }
     if (!form.email.includes("@")) {
-      return t("sponsors.errors.email");
+      return "Please enter a valid email.";
     }
     return null;
   }
@@ -125,7 +113,7 @@ export default function SponsorsPage() {
       setSuccessMessage(response.message);
       setForm(INITIAL_FORM);
     } catch (err) {
-      setFormError(toFriendlyFormError(err, t));
+      setFormError(toFriendlyFormError(err));
     } finally {
       setSubmitting(false);
     }
@@ -136,9 +124,12 @@ export default function SponsorsPage() {
       <section className="rounded-2xl border border-border/70 bg-white/80 p-6 shadow-sm md:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t("brand.name")}</p>
-            <h1 className="mt-2 text-3xl font-semibold md:text-4xl">{t("sponsors.title")}</h1>
-            <p className="mt-4 max-w-3xl text-base text-muted-foreground">{t("sponsors.body")}</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">AI Nepal Platform</p>
+            <h1 className="mt-2 text-3xl font-semibold md:text-4xl">Sponsor the Mission</h1>
+            <p className="mt-4 max-w-3xl text-base text-muted-foreground">
+              Help students, schools, and community programs get practical AI support through transparent sponsorship
+              packages.
+            </p>
           </div>
 
           <div className="flex gap-2">
@@ -146,15 +137,15 @@ export default function SponsorsPage() {
               href="/"
               className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium text-muted-foreground transition hover:text-foreground"
             >
-              {t("nav.home")}
+              Home
             </Link>
           </div>
         </div>
       </section>
 
       <section className="mt-8">
-        <h2 className="text-2xl font-semibold">{t("sponsors.packagesTitle")}</h2>
-        <p className="mt-2 text-sm text-muted-foreground">{t("sponsors.packagesBody")}</p>
+        <h2 className="text-2xl font-semibold">Sponsorship Packages</h2>
+        <p className="mt-2 text-sm text-muted-foreground">Choose a tier that fits your impact goals.</p>
 
         {packageError ? <div className="mt-4"><StateMessage tone="warning" message={packageError} /></div> : null}
 
@@ -174,10 +165,10 @@ export default function SponsorsPage() {
             : packages.map((item) => (
                 <article key={item.id} className="rounded-2xl border border-border/80 bg-white/85 p-5 shadow-sm">
                   <h3 className="text-xl font-semibold">{item.name}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{item.price_label ?? t("sponsors.customPartnership")}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{item.price_label ?? "Custom partnership"}</p>
                   <p className="mt-3 text-sm text-muted-foreground">{item.description}</p>
                   <p className="mt-4 text-sm font-medium text-[hsl(var(--primary))]">
-                    {t("sponsors.monthlySupport")}: {item.monthly_request_limit.toLocaleString()}
+                    Monthly request support: {item.monthly_request_limit.toLocaleString()}
                   </p>
                 </article>
               ))}
@@ -185,18 +176,20 @@ export default function SponsorsPage() {
 
         {!loadingPackages && !packageError && packages.length === 0 ? (
           <div className="mt-4">
-            <StateMessage tone="info" message={t("sponsors.packagesEmpty")} />
+            <StateMessage tone="info" message="No sponsor packages are listed yet. Please check back soon." />
           </div>
         ) : null}
       </section>
 
       <section className="mt-8 rounded-2xl border border-border/70 bg-white/85 p-6 shadow-sm md:p-8">
-        <h2 className="text-2xl font-semibold">{t("sponsors.formTitle")}</h2>
-        <p className="mt-2 text-sm text-muted-foreground">{t("sponsors.formBody")}</p>
+        <h2 className="text-2xl font-semibold">Sponsor Interest Form</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Fill this once and our team will contact you with next steps.
+        </p>
 
         <form className="mt-6 grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
           <label className="text-sm">
-            <span className="mb-1 block font-medium">{t("sponsors.fields.organization")} *</span>
+            <span className="mb-1 block font-medium">Organization name *</span>
             <input
               value={form.organization_name}
               onChange={(event) => setField("organization_name", event.target.value)}
@@ -206,7 +199,7 @@ export default function SponsorsPage() {
           </label>
 
           <label className="text-sm">
-            <span className="mb-1 block font-medium">{t("sponsors.fields.contact")} *</span>
+            <span className="mb-1 block font-medium">Contact name *</span>
             <input
               value={form.contact_name}
               onChange={(event) => setField("contact_name", event.target.value)}
@@ -216,7 +209,7 @@ export default function SponsorsPage() {
           </label>
 
           <label className="text-sm">
-            <span className="mb-1 block font-medium">{t("sponsors.fields.email")} *</span>
+            <span className="mb-1 block font-medium">Email *</span>
             <input
               type="email"
               value={form.email}
@@ -227,7 +220,7 @@ export default function SponsorsPage() {
           </label>
 
           <label className="text-sm">
-            <span className="mb-1 block font-medium">{t("sponsors.fields.phone")}</span>
+            <span className="mb-1 block font-medium">Phone</span>
             <input
               value={form.phone}
               onChange={(event) => setField("phone", event.target.value)}
@@ -236,7 +229,7 @@ export default function SponsorsPage() {
           </label>
 
           <label className="text-sm">
-            <span className="mb-1 block font-medium">{t("sponsors.fields.type")}</span>
+            <span className="mb-1 block font-medium">Sponsor type</span>
             <input
               value={form.sponsor_type}
               onChange={(event) => setField("sponsor_type", event.target.value)}
@@ -245,7 +238,7 @@ export default function SponsorsPage() {
           </label>
 
           <label className="text-sm">
-            <span className="mb-1 block font-medium">{t("sponsors.fields.budget")}</span>
+            <span className="mb-1 block font-medium">Budget range</span>
             <input
               value={form.budget_range}
               onChange={(event) => setField("budget_range", event.target.value)}
@@ -254,7 +247,7 @@ export default function SponsorsPage() {
           </label>
 
           <label className="text-sm md:col-span-2">
-            <span className="mb-1 block font-medium">{t("sponsors.fields.target")}</span>
+            <span className="mb-1 block font-medium">Target group</span>
             <input
               value={form.target_group}
               onChange={(event) => setField("target_group", event.target.value)}
@@ -263,12 +256,12 @@ export default function SponsorsPage() {
           </label>
 
           <label className="text-sm md:col-span-2">
-            <span className="mb-1 block font-medium">{t("sponsors.fields.message")}</span>
+            <span className="mb-1 block font-medium">Message</span>
             <textarea
               value={form.message}
               onChange={(event) => setField("message", event.target.value)}
               className="min-h-28 w-full rounded-lg border border-border bg-white px-3 py-2"
-              placeholder={t("sponsors.fields.messagePlaceholder")}
+              placeholder="Tell us about your sponsorship goals..."
             />
           </label>
 
@@ -278,11 +271,13 @@ export default function SponsorsPage() {
               disabled={submitting}
               className="min-h-11 rounded-lg bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-[hsl(var(--primary-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {submitting ? t("sponsors.submitting") : t("sponsors.submit")}
+              {submitting ? "Submitting..." : "Submit interest"}
             </button>
 
             {formError ? <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</p> : null}
-            {successMessage ? <p className="mt-3 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">{successMessage}</p> : null}
+            {successMessage ? (
+              <p className="mt-3 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">{successMessage}</p>
+            ) : null}
           </div>
         </form>
       </section>
