@@ -6,14 +6,15 @@ type ToolCardProps = {
   slug?: string;
   description: string;
   ctaLabel?: string;
+  ariaLabel?: string;
 };
 
-export function ToolCard({ href, title, slug, description, ctaLabel = "Open tool" }: ToolCardProps) {
+export function ToolCard({ href, title, slug, description, ctaLabel = "Open tool", ariaLabel }: ToolCardProps) {
   return (
     <Link
       href={href}
       className="group flex h-full flex-col rounded-2xl border border-border/80 bg-white/90 p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))]"
-      aria-label={`${title} tool`}
+      aria-label={ariaLabel ?? title}
     >
       <div className="flex items-start justify-between gap-3">
         <h3 className="text-lg font-semibold leading-snug group-hover:text-[hsl(var(--primary))]">{title}</h3>
