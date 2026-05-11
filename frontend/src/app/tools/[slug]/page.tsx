@@ -97,17 +97,23 @@ export default function ToolRunPage() {
           </Link>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-2">
+        <div
+          className="mt-6 inline-flex w-full items-center gap-1 overflow-x-auto rounded-full border border-border bg-white p-1"
+          role="tablist"
+          aria-label="Tool selector"
+        >
           {Object.entries(toolNames).map(([toolSlug, toolName]) => {
             const isActive = toolSlug === slug;
             return (
               <Link
                 key={toolSlug}
                 href={`/tools/${toolSlug}`}
-                className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                role="tab"
+                aria-selected={isActive}
+                className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] ${
                   isActive
-                    ? "border-transparent bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"
-                    : "border-border bg-white text-muted-foreground hover:text-foreground"
+                    ? "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"
+                    : "text-muted-foreground"
                 }`}
               >
                 {toolName}
