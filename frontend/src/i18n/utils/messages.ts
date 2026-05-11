@@ -5,7 +5,9 @@ export const supportedLocales = ["en", "ne"] as const;
 
 export type Locale = (typeof supportedLocales)[number];
 
-export type TranslationTree = Record<string, string | TranslationTree>;
+export interface TranslationTree {
+  [key: string]: string | TranslationTree;
+}
 
 const messageCatalog: Record<Locale, TranslationTree> = {
   en: enCommon as TranslationTree,

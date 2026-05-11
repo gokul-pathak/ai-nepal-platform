@@ -19,11 +19,27 @@ function isSupportedLocale(value: string): value is Locale {
   return supportedLocales.includes(value as Locale);
 }
 
+function safeGetItem(key: string): string | null {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSetItem(key: string, value: string): void {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Silently ignore storage errors
+  }
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("en");
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
+    const stored = safeGetItem(STORAGE_KEY);
     if (stored && isSupportedLocale(stored)) {
       setLocaleState(stored);
       return;
@@ -35,7 +51,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.lang = locale;
-    window.localStorage.setItem(STORAGE_KEY, locale);
+    safeSetItem(STORAGE_KEY, locale);
   }, [locale]);
 
   const value = useMemo<I18nContextValue>(

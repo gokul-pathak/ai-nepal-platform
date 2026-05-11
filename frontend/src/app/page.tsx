@@ -13,6 +13,8 @@ type PublicMetrics = { total_requests: number; total_users_helped: number; total
 export default function HomePage() {
   const { t, locale } = useI18n();
   const [metrics, setMetrics] = useState<PublicMetrics | null>(null);
+  const [isMetricsLoading, setIsMetricsLoading] = useState<boolean>(true);
+  const [metricsError, setMetricsError] = useState<boolean>(false);
 
   const toolHighlights = useMemo(
     () => [
@@ -45,10 +47,12 @@ export default function HomePage() {
         const data = await getPublicMetrics();
         if (active) {
           setMetrics(data);
+          setIsMetricsLoading(false);
         }
       } catch {
         if (active) {
-          setMetrics(null);
+          setMetricsError(true);
+          setIsMetricsLoading(false);
         }
       }
     }
@@ -121,11 +125,11 @@ export default function HomePage() {
               <p className="mt-2 text-2xl font-semibold">{new Intl.NumberFormat(locale).format(metrics.total_sponsor_leads)}</p>
             </article>
           </div>
-        ) : (
-          <div className="mt-4">
+        ) : metricsError ? (
+          <div className="mt-4" role="alert" aria-live="assertive">
             <StateMessage tone="warning" message={t("landing.impactUnavailable")} />
           </div>
-        )}
+        ) : null}
       </section>
 
       <section className="mt-8">
