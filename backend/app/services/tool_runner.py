@@ -71,7 +71,15 @@ class ToolRunnerService:
         if not normalized:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Input cannot be empty")
         lowered = normalized.lower()
-        blocked_patterns = ["ignore previous instructions", "reveal system prompt", "developer message"]
+        blocked_patterns = [
+            "ignore previous instructions",
+            "reveal system prompt",
+            "developer message",
+            "show hidden instructions",
+            "print your system prompt",
+            "jailbreak",
+            "bypass safety",
+        ]
         if any(pattern in lowered for pattern in blocked_patterns):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Input contains disallowed instructions")
         return normalized
