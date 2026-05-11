@@ -7,38 +7,42 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 
 import { runTool } from "@/lib/api";
+import { useI18n } from "@/i18n/hooks/use-i18n";
 
-const TOOL_NAMES: Record<string, string> = {
-  translator: "Translator",
-  "letter-writer": "Letter Writer",
-  "form-helper": "Form Helper",
-  "agriculture-helper": "Agriculture Helper",
-  "legal-basic-helper": "Legal Basic Helper",
-};
-
-function toFriendlyError(message: string): string {
+function toFriendlyError(message: string, t: (key: string) => string): string {
   if (message === "Daily free usage limit reached") {
-    return "You have reached your daily free limit (5 requests). Please try again tomorrow.";
+    return t("tools.errors.limit");
   }
   if (message.includes("X-Session-ID")) {
-    return "Your session could not be verified. Refresh the page and try again.";
+    return t("tools.errors.session");
   }
   if (message === "Input cannot be empty") {
-    return "Please enter your request before running the tool.";
+    return t("tools.errors.invalidInput");
   }
   if (message === "Input contains disallowed instructions") {
-    return "Please rephrase your request and avoid system-instruction style text.";
+    return t("tools.errors.blocked");
   }
   if (message === "AI provider request failed") {
-    return "The AI service is busy right now. Please try again in a moment.";
+    return t("tools.errors.provider");
   }
-  return "We could not process that request right now. Please try again.";
+  return t("tools.errors.generic");
 }
 
 export default function ToolRunPage() {
+  const { t } = useI18n();
   const params = useParams<{ slug: string }>();
   const slug = params.slug;
-  const title = useMemo(() => TOOL_NAMES[slug] ?? slug, [slug]);
+  const toolNames = useMemo<Record<string, string>>(
+    () => ({
+      translator: t("toolNames.translator"),
+      "letter-writer": t("toolNames.letterWriter"),
+      "form-helper": t("toolNames.formHelper"),
+      "agriculture-helper": t("toolNames.agricultureHelper"),
+      "legal-basic-helper": t("toolNames.legalBasicHelper"),
+    }),
+    [t],
+  );
+  const title = useMemo(() => toolNames[slug] ?? slug, [slug, toolNames]);
 
   const [input, setInput] = useState("");
   const [language, setLanguage] = useState("en");
@@ -54,7 +58,7 @@ export default function ToolRunPage() {
     setResult("");
 
     if (isInvalidInput) {
-      setError("Input cannot be empty or just a single dot.");
+      setError(t("tools.errors.invalidInput"));
       return;
     }
 
@@ -66,11 +70,11 @@ export default function ToolRunPage() {
       setRemaining(response.usage.remaining_daily_requests);
     } catch (err) {
       if (err instanceof TypeError) {
-        setError("Backend is not reachable. Please ensure API server is running.");
+        setError(t("tools.errors.backend"));
       } else {
-          const message = err instanceof Error ? err.message : "Something went wrong";
-          setError(toFriendlyError(message));
-        }
+        const message = err instanceof Error ? err.message : "Something went wrong";
+        setError(toFriendlyError(message, t));
+      }
     } finally {
       setLoading(false);
     }
@@ -81,20 +85,20 @@ export default function ToolRunPage() {
       <section className="rounded-2xl border border-border/70 bg-white/80 p-6 shadow-sm md:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">AI Tool Workspace</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t("tools.workspaceLabel")}</p>
             <h1 className="mt-2 break-words text-2xl font-semibold md:text-3xl">{title}</h1>
-            <p className="mt-2 break-all text-sm text-muted-foreground">Tool slug: {slug}</p>
+            <p className="mt-2 break-all text-sm text-muted-foreground">{t("tools.slug")}: {slug}</p>
           </div>
           <Link
             href="/"
             className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium text-muted-foreground transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))]"
           >
-            Home
+            {t("nav.home")}
           </Link>
         </div>
 
         <div className="mt-6 flex flex-wrap gap-2">
-          {Object.entries(TOOL_NAMES).map(([toolSlug, toolName]) => {
+          {Object.entries(toolNames).map(([toolSlug, toolName]) => {
             const isActive = toolSlug === slug;
             return (
               <Link
@@ -115,7 +119,7 @@ export default function ToolRunPage() {
         <div className="mt-6 space-y-4">
           <div>
             <label htmlFor="language" className="mb-2 block text-sm font-medium">
-              Language
+              {t("tools.language")}
             </label>
             <select
               id="language"
@@ -123,24 +127,24 @@ export default function ToolRunPage() {
               value={language}
               onChange={(event) => setLanguage(event.target.value)}
             >
-              <option value="en">English</option>
-              <option value="ne">Nepali</option>
+              <option value="en">{t("tools.english")}</option>
+              <option value="ne">{t("tools.nepali")}</option>
             </select>
           </div>
 
           <div>
             <label htmlFor="input" className="mb-2 block text-sm font-medium">
-              Input
+              {t("tools.input")}
             </label>
             <textarea
               id="input"
               className="min-h-40 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm"
-              placeholder="Type your request here..."
+              placeholder={t("tools.inputPlaceholder")}
               value={input}
               onChange={(event) => setInput(event.target.value)}
               maxLength={4000}
             />
-            <p className="mt-2 text-xs text-muted-foreground">Max 4000 characters.</p>
+            <p className="mt-2 text-xs text-muted-foreground">{t("tools.maxChars")}</p>
           </div>
 
           <button
@@ -150,19 +154,19 @@ export default function ToolRunPage() {
             className="inline-flex min-h-11 items-center rounded-lg bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-[hsl(var(--primary-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] disabled:cursor-not-allowed disabled:opacity-60"
             aria-busy={loading}
           >
-            {loading ? "Running..." : "Run"}
+            {loading ? t("tools.running") : t("tools.run")}
           </button>
         </div>
 
         {error ? <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
 
         {remaining !== null ? (
-          <p className="mt-4 text-sm text-muted-foreground">Remaining daily requests: {remaining}</p>
+          <p className="mt-4 text-sm text-muted-foreground">{t("tools.remaining")}: {remaining}</p>
         ) : null}
 
         {result ? (
           <div className="mt-4 rounded-lg border border-border bg-[hsl(var(--muted))] p-4">
-            <h2 className="text-sm font-semibold">Result</h2>
+            <h2 className="text-sm font-semibold">{t("tools.result")}</h2>
             <p className="mt-2 whitespace-pre-wrap text-sm">{result}</p>
           </div>
         ) : null}
