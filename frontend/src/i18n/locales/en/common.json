@@ -21,6 +21,7 @@
     "viewAllTools": "View all tools",
     "openWorkspace": "Open workspace",
     "openTool": "Open tool",
+    "openToolAria": "{{toolName}} Open tool",
     "status": "Status",
     "created": "Created"
   },
