@@ -111,8 +111,11 @@ export default function HomePage() {
         <h2 className="mt-2 text-2xl font-semibold md:text-3xl">{t("landing.impactTitle")}</h2>
 
         {isMetricsLoading ? (
-          <div className="mt-6 flex items-center justify-center py-8" role="status" aria-live="polite">
-            <div className="text-sm text-muted-foreground">{t("common.loading")}</div>
+          <div className="mt-6 flex items-center justify-center py-12" role="status" aria-live="polite">
+            <div className="flex flex-col items-center gap-3">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary"></div>
+              <div className="text-sm text-muted-foreground">{t("common.loading")}</div>
+            </div>
           </div>
         ) : metrics ? (
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
