@@ -97,10 +97,9 @@ export default function ToolRunPage() {
           </Link>
         </div>
 
-        <div
+        <nav
           className="mt-6 inline-flex w-full items-center gap-1 overflow-x-auto rounded-full border border-border bg-white p-1"
-          role="tablist"
-          aria-label="Tool selector"
+          aria-label={t("tools.headerTitle")}
         >
           {Object.entries(toolNames).map(([toolSlug, toolName]) => {
             const isActive = toolSlug === slug;
@@ -108,8 +107,6 @@ export default function ToolRunPage() {
               <Link
                 key={toolSlug}
                 href={`/tools/${toolSlug}`}
-                role="tab"
-                aria-selected={isActive}
                 className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] ${
                   isActive
                     ? "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"
@@ -120,7 +117,7 @@ export default function ToolRunPage() {
               </Link>
             );
           })}
-        </div>
+        </nav>
 
         <div className="mt-6 space-y-4">
           <div>

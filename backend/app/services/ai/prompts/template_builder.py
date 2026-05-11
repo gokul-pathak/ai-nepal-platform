@@ -1,5 +1,7 @@
 def _language_instruction(language: str) -> str:
-    if language.lower() == "ne":
+    # Normalize language code: lowercase and extract base language (e.g., "ne-NP" -> "ne")
+    base_language = language.lower().split('-')[0].split('_')[0]
+    if base_language == "ne":
         return (
             "Write in clear, natural Nepali using respectful everyday wording suitable for users in Nepal. "
             "Prefer simple sentence structure over complex jargon."

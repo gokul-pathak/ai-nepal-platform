@@ -78,7 +78,7 @@ export default function ToolsPage() {
                 slug={tool.slug}
                 description={tool.description ?? t("tools.defaultDescription")}
                 ctaLabel={t("common.openWorkspace")}
-                ariaLabel={`${tool.name} ${t("common.openWorkspace")}`}
+                ariaLabel={`Open ${tool.name} tool`}
               />
             ))}
           </div>
