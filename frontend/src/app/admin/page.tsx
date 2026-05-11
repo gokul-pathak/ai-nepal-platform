@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import { AdminMetricsResponse, getAdminMetrics } from "@/lib/api";
+import { useI18n } from "@/i18n/hooks/use-i18n";
 
 const ADMIN_KEY_STORAGE = "admin_api_key";
 
@@ -12,6 +13,7 @@ function formatDate(value: string): string {
 }
 
 export default function AdminPage() {
+  const { t } = useI18n();
   const [adminKey, setAdminKey] = useState("");
   const [metrics, setMetrics] = useState<AdminMetricsResponse | null>(null);
   const [error, setError] = useState("");
@@ -46,7 +48,7 @@ export default function AdminPage() {
       }
       if (!controller.signal.aborted) {
         setMetrics(null);
-        setError(err instanceof Error ? err.message : "Failed to load metrics");
+        setError(err instanceof Error ? err.message : t("admin.loadFailed"));
       }
     } finally {
       if (!controller.signal.aborted) {
@@ -58,7 +60,7 @@ export default function AdminPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!adminKey.trim()) {
-      setError("Admin API key is required");
+      setError(t("admin.keyRequired"));
       return;
     }
 
@@ -81,30 +83,30 @@ export default function AdminPage() {
       <section className="rounded-2xl border border-border/70 bg-white/85 p-6 shadow-sm md:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Admin Metrics Access</p>
-            <h1 className="mt-2 text-3xl font-semibold md:text-4xl">Admin Dashboard</h1>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t("admin.label")}</p>
+            <h1 className="mt-2 text-3xl font-semibold md:text-4xl">{t("admin.title")}</h1>
             <p className="mt-3 text-sm text-muted-foreground">
-              Enter admin API key to view internal metrics. The key is stored in session storage only.
+              {t("admin.body")}
             </p>
           </div>
           <Link
             href="/"
             className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium text-muted-foreground transition hover:text-foreground"
           >
-            Back to home
+            {t("common.backToHome")}
           </Link>
         </div>
 
         <form className="mt-5 flex flex-wrap gap-3" onSubmit={handleSubmit}>
           <label htmlFor="admin-api-key" className="sr-only">
-            Admin API key
+            {t("admin.apiKey")}
           </label>
           <input
             id="admin-api-key"
             type="password"
             value={adminKey}
             onChange={(event) => setAdminKey(event.target.value)}
-            placeholder="Enter admin API key"
+            placeholder={t("admin.apiKeyPlaceholder")}
             className="w-full max-w-md rounded-lg border border-border bg-white px-3 py-2 text-sm"
           />
           <button
@@ -112,14 +114,14 @@ export default function AdminPage() {
             disabled={loading}
             className="rounded-lg bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-[hsl(var(--primary-foreground))] disabled:opacity-60"
           >
-            {loading ? "Loading..." : "Load metrics"}
+            {loading ? t("common.loading") : t("admin.load")}
           </button>
           <button
             type="button"
             onClick={handleLogout}
             className="rounded-lg border border-border bg-white px-4 py-2 text-sm font-medium text-muted-foreground"
           >
-            Clear key
+            {t("admin.clear")}
           </button>
         </form>
 
@@ -131,28 +133,28 @@ export default function AdminPage() {
           <section className="mt-6 grid gap-4 sm:grid-cols-3">
             <article className="rounded-2xl border border-border/80 bg-white/85 p-5 shadow-sm">
               <p className="text-lg">📈</p>
-              <h2 className="text-sm text-muted-foreground">Total requests</h2>
+              <h2 className="text-sm text-muted-foreground">{t("admin.totalRequests")}</h2>
               <p className="mt-2 text-3xl font-semibold">{metrics.total_tool_usage_count.toLocaleString()}</p>
             </article>
             <article className="rounded-2xl border border-border/80 bg-white/85 p-5 shadow-sm">
               <p className="text-lg">👥</p>
-              <h2 className="text-sm text-muted-foreground">Users helped</h2>
+              <h2 className="text-sm text-muted-foreground">{t("admin.usersHelped")}</h2>
               <p className="mt-2 text-3xl font-semibold">{metrics.total_users_helped.toLocaleString()}</p>
             </article>
             <article className="rounded-2xl border border-border/80 bg-white/85 p-5 shadow-sm">
               <p className="text-lg">🤝</p>
-              <h2 className="text-sm text-muted-foreground">Sponsor lead count</h2>
+              <h2 className="text-sm text-muted-foreground">{t("admin.leadCount")}</h2>
               <p className="mt-2 text-3xl font-semibold">{metrics.sponsor_lead_count.toLocaleString()}</p>
             </article>
           </section>
 
           <section className="mt-8 rounded-2xl border border-border/80 bg-white/85 p-6 shadow-sm">
-            <h2 className="text-xl font-semibold">Most Used Tools</h2>
+            <h2 className="text-xl font-semibold">{t("admin.mostUsedTools")}</h2>
             <div className="mt-4 space-y-3">
               {metrics.usage_count_by_tool.map((item) => (
                 <div key={item.tool_slug} className="flex items-center justify-between rounded-lg border border-border/70 px-4 py-3">
                   <span className="text-sm font-medium">{item.tool_slug}</span>
-                  <span className="text-sm text-muted-foreground">{item.count.toLocaleString()} requests</span>
+                  <span className="text-sm text-muted-foreground">{item.count.toLocaleString()} {t("admin.requests")}</span>
                 </div>
               ))}
             </div>
@@ -160,15 +162,15 @@ export default function AdminPage() {
 
           <section className="mt-8 grid gap-6 lg:grid-cols-2">
             <article className="rounded-2xl border border-border/80 bg-white/85 p-6 shadow-sm">
-              <h2 className="text-xl font-semibold">Latest Sponsor Leads</h2>
+               <h2 className="text-xl font-semibold">{t("admin.latestLeads")}</h2>
               <div className="mt-4 overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
                   <thead className="text-muted-foreground">
                     <tr>
-                      <th className="pb-2">Organization</th>
-                      <th className="pb-2">Contact</th>
-                      <th className="pb-2">Status</th>
-                      <th className="pb-2">Created</th>
+                       <th className="pb-2">{t("admin.organization")}</th>
+                       <th className="pb-2">{t("admin.contact")}</th>
+                       <th className="pb-2">{t("common.status")}</th>
+                       <th className="pb-2">{t("common.created")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -186,15 +188,15 @@ export default function AdminPage() {
             </article>
 
             <article className="rounded-2xl border border-border/80 bg-white/85 p-6 shadow-sm">
-              <h2 className="text-xl font-semibold">Latest Tool Usage</h2>
+               <h2 className="text-xl font-semibold">{t("admin.latestUsage")}</h2>
               <div className="mt-4 overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
                   <thead className="text-muted-foreground">
                     <tr>
-                      <th className="pb-2">Tool</th>
-                      <th className="pb-2">Language</th>
-                      <th className="pb-2">Status</th>
-                      <th className="pb-2">Created</th>
+                       <th className="pb-2">{t("admin.tool")}</th>
+                       <th className="pb-2">{t("admin.language")}</th>
+                       <th className="pb-2">{t("common.status")}</th>
+                       <th className="pb-2">{t("common.created")}</th>
                     </tr>
                   </thead>
                   <tbody>

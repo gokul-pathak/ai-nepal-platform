@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Noto_Sans } from "next/font/google";
 
+import { AppShell } from "@/components/app-shell";
+import { I18nProvider } from "@/i18n/provider/i18n-provider";
+
 import "./globals.css";
 
 const notoSans = Noto_Sans({
@@ -24,7 +27,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${notoSans.variable} min-h-screen font-sans antialiased`}>
-        {children}
+        <I18nProvider>
+          <AppShell>{children}</AppShell>
+        </I18nProvider>
       </body>
     </html>
   );

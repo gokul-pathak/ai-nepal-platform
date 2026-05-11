@@ -1,38 +1,66 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 import { getPublicMetrics } from "@/lib/api";
 import { ToolCard } from "@/components/tool-card";
 import { StateMessage } from "@/components/state-message";
+import { useI18n } from "@/i18n/hooks/use-i18n";
 
-const toolHighlights = [
-  {
-    href: "/tools/translator",
-    title: "Translator",
-    slug: "translator",
-    body: "Translate local communication quickly between Nepali and English.",
-  },
-  {
-    href: "/tools/letter-writer",
-    title: "Letter Writer",
-    slug: "letter-writer",
-    body: "Draft polite letters for schools, offices, banks, and services.",
-  },
-  {
-    href: "/tools/form-helper",
-    title: "Form Helper",
-    slug: "form-helper",
-    body: "Get guided text for common form fields with clear language.",
-  },
-];
+type PublicMetrics = { total_requests: number; total_users_helped: number; total_sponsor_leads: number };
 
-export default async function HomePage() {
-  let metrics: { total_requests: number; total_users_helped: number; total_sponsor_leads: number } | null = null;
+export default function HomePage() {
+  const { t, locale } = useI18n();
+  const [metrics, setMetrics] = useState<PublicMetrics | null>(null);
+  const [isMetricsLoading, setIsMetricsLoading] = useState<boolean>(true);
+  const [metricsError, setMetricsError] = useState<boolean>(false);
 
-  try {
-    metrics = await getPublicMetrics();
-  } catch {
-    metrics = null;
-  }
+  const toolHighlights = useMemo(
+    () => [
+      {
+        href: "/tools/translator",
+        title: t("toolNames.translator"),
+        slug: "translator",
+        body: t("landing.toolTranslator"),
+      },
+      {
+        href: "/tools/letter-writer",
+        title: t("toolNames.letterWriter"),
+        slug: "letter-writer",
+        body: t("landing.toolLetterWriter"),
+      },
+      {
+        href: "/tools/form-helper",
+        title: t("toolNames.formHelper"),
+        slug: "form-helper",
+        body: t("landing.toolFormHelper"),
+      },
+    ],
+    [t],
+  );
+
+  useEffect(() => {
+    let active = true;
+    async function loadMetrics() {
+      try {
+        const data = await getPublicMetrics();
+        if (active) {
+          setMetrics(data);
+          setIsMetricsLoading(false);
+        }
+      } catch {
+        if (active) {
+          setMetricsError(true);
+          setIsMetricsLoading(false);
+        }
+      }
+    }
+    void loadMetrics();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-5 py-8 md:px-10 md:py-12">
@@ -40,13 +68,12 @@ export default async function HomePage() {
         <div className="pointer-events-none absolute -left-10 -top-8 h-36 w-36 rounded-full bg-rose-200/40 blur-2xl" />
         <div className="pointer-events-none absolute -right-12 bottom-0 h-40 w-40 rounded-full bg-orange-200/50 blur-2xl" />
 
-        <p className="text-sm font-medium uppercase tracking-[0.24em] text-muted-foreground">AI Nepal Platform</p>
+        <p className="text-sm font-medium uppercase tracking-[0.24em] text-muted-foreground">{t("brand.name")}</p>
         <h1 className="mt-3 max-w-4xl text-3xl font-semibold leading-tight md:text-5xl">
-          Practical AI support for students, SMEs, and communities across Nepal.
+          {t("landing.heroTitle")}
         </h1>
         <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">
-          We build simple, trustworthy tools for everyday tasks: writing, translating, and understanding forms with
-          language that feels local and clear.
+          {t("landing.heroBody")}
         </p>
 
         <div className="mt-7 flex flex-wrap gap-3">
@@ -54,13 +81,13 @@ export default async function HomePage() {
             href="/tools"
             className="rounded-lg bg-[hsl(var(--primary))] px-5 py-2.5 text-sm font-medium text-[hsl(var(--primary-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))]"
           >
-            Explore tools
+            {t("landing.ctaTools")}
           </Link>
           <Link
             href="/sponsors"
             className="rounded-lg border border-border bg-white px-5 py-2.5 text-sm font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))]"
           >
-            Sponsor the mission
+            {t("landing.ctaSponsors")}
           </Link>
         </div>
 
@@ -72,74 +99,81 @@ export default async function HomePage() {
       </section>
 
       <section className="mt-8 rounded-2xl border border-border/80 bg-white/85 p-6 shadow-sm md:p-8">
-        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Mission</p>
-        <h2 className="mt-2 text-2xl font-semibold md:text-3xl">Digital help that is useful, affordable, and inclusive</h2>
+        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t("landing.missionLabel")}</p>
+        <h2 className="mt-2 text-2xl font-semibold md:text-3xl">{t("landing.missionTitle")}</h2>
         <p className="mt-3 max-w-4xl text-sm leading-7 text-muted-foreground md:text-base">
-          The platform focuses on practical outcomes: saving time for small businesses, helping students draft better
-          writing, and supporting first-time digital users with guided AI tools.
+          {t("landing.missionBody")}
         </p>
       </section>
 
       <section className="mt-8 rounded-2xl border border-border/80 bg-white/85 p-6 shadow-sm md:p-8" aria-live="polite">
-        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Public Impact</p>
-        <h2 className="mt-2 text-2xl font-semibold md:text-3xl">Platform Snapshot</h2>
+        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t("landing.impactLabel")}</p>
+        <h2 className="mt-2 text-2xl font-semibold md:text-3xl">{t("landing.impactTitle")}</h2>
 
         {metrics ? (
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             <article className="rounded-xl border border-border/70 bg-white px-4 py-4">
-              <p className="text-sm text-muted-foreground">Total requests</p>
-              <p className="mt-2 text-2xl font-semibold">{metrics.total_requests.toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground">{t("landing.totalRequests")}</p>
+              <p className="mt-2 text-2xl font-semibold">{new Intl.NumberFormat(locale).format(metrics.total_requests)}</p>
             </article>
             <article className="rounded-xl border border-border/70 bg-white px-4 py-4">
-              <p className="text-sm text-muted-foreground">Users helped</p>
-              <p className="mt-2 text-2xl font-semibold">{metrics.total_users_helped.toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground">{t("landing.usersHelped")}</p>
+              <p className="mt-2 text-2xl font-semibold">{new Intl.NumberFormat(locale).format(metrics.total_users_helped)}</p>
             </article>
             <article className="rounded-xl border border-border/70 bg-white px-4 py-4">
-              <p className="text-sm text-muted-foreground">Sponsor interests</p>
-              <p className="mt-2 text-2xl font-semibold">{metrics.total_sponsor_leads.toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground">{t("landing.sponsorInterests")}</p>
+              <p className="mt-2 text-2xl font-semibold">{new Intl.NumberFormat(locale).format(metrics.total_sponsor_leads)}</p>
             </article>
           </div>
-        ) : (
-          <div className="mt-4">
-            <StateMessage tone="warning" message="Live impact metrics are temporarily unavailable. Please check back soon." />
+        ) : metricsError ? (
+          <div className="mt-4" role="alert" aria-live="assertive">
+            <StateMessage tone="warning" message={t("landing.impactUnavailable")} />
           </div>
-        )}
+        ) : null}
       </section>
 
       <section className="mt-8">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">AI Tools</p>
-            <h2 className="mt-2 text-2xl font-semibold md:text-3xl">Built for everyday tasks</h2>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t("landing.toolsLabel")}</p>
+            <h2 className="mt-2 text-2xl font-semibold md:text-3xl">{t("landing.toolsTitle")}</h2>
           </div>
           <Link href="/tools" className="text-sm font-medium text-[hsl(var(--primary))]">
-            View all tools
+            {t("common.viewAllTools")}
           </Link>
         </div>
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {toolHighlights.map((tool) => (
-            <ToolCard key={tool.slug} href={tool.href} title={tool.title} slug={tool.slug} description={tool.body} />
+            <ToolCard
+              key={tool.slug}
+              href={tool.href}
+              title={tool.title}
+              slug={tool.slug}
+              description={tool.body}
+              ctaLabel={t("common.openTool")}
+              ariaLabel={t("common.openToolAria", { toolName: tool.title })}
+            />
           ))}
         </div>
       </section>
 
       <section className="mt-8 rounded-2xl border border-border/70 bg-[hsl(var(--muted))] p-6 md:p-8">
-        <h2 className="text-2xl font-semibold md:text-3xl">Support AI access for underserved communities</h2>
+        <h2 className="text-2xl font-semibold md:text-3xl">{t("landing.sponsorTitle")}</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground md:text-base">
-          Sponsor packages help keep AI assistance available for students, rural entrepreneurs, and grassroots programs.
+          {t("landing.sponsorBody")}
         </p>
         <div className="mt-5">
           <Link
             href="/sponsors"
             className="inline-flex rounded-lg bg-[hsl(var(--primary))] px-5 py-2.5 text-sm font-medium text-[hsl(var(--primary-foreground))]"
           >
-            Become a sponsor
+            {t("landing.sponsorCta")}
           </Link>
         </div>
       </section>
 
       <footer className="mt-10 border-t border-border/80 py-6 text-sm text-muted-foreground">
-        <p>AI Nepal Platform - public-good AI utilities for Nepal.</p>
+        <p>{t("brand.tagline")}</p>
       </footer>
     </main>
   );
