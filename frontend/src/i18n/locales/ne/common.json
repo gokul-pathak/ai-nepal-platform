@@ -21,6 +21,7 @@
     "viewAllTools": "सबै टुलहरू हेर्नुहोस्",
     "openWorkspace": "वर्कस्पेस खोल्नुहोस्",
     "openTool": "टुल खोल्नुहोस्",
+    "openToolAria": "{{toolName}} टुल खोल्नुहोस्",
     "status": "स्थिति",
     "created": "सिर्जना मिति"
   },

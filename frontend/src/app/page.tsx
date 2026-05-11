@@ -11,7 +11,7 @@ import { useI18n } from "@/i18n/hooks/use-i18n";
 type PublicMetrics = { total_requests: number; total_users_helped: number; total_sponsor_leads: number };
 
 export default function HomePage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [metrics, setMetrics] = useState<PublicMetrics | null>(null);
 
   const toolHighlights = useMemo(
@@ -110,15 +110,15 @@ export default function HomePage() {
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             <article className="rounded-xl border border-border/70 bg-white px-4 py-4">
               <p className="text-sm text-muted-foreground">{t("landing.totalRequests")}</p>
-              <p className="mt-2 text-2xl font-semibold">{metrics.total_requests.toLocaleString()}</p>
+              <p className="mt-2 text-2xl font-semibold">{new Intl.NumberFormat(locale).format(metrics.total_requests)}</p>
             </article>
             <article className="rounded-xl border border-border/70 bg-white px-4 py-4">
               <p className="text-sm text-muted-foreground">{t("landing.usersHelped")}</p>
-              <p className="mt-2 text-2xl font-semibold">{metrics.total_users_helped.toLocaleString()}</p>
+              <p className="mt-2 text-2xl font-semibold">{new Intl.NumberFormat(locale).format(metrics.total_users_helped)}</p>
             </article>
             <article className="rounded-xl border border-border/70 bg-white px-4 py-4">
               <p className="text-sm text-muted-foreground">{t("landing.sponsorInterests")}</p>
-              <p className="mt-2 text-2xl font-semibold">{metrics.total_sponsor_leads.toLocaleString()}</p>
+              <p className="mt-2 text-2xl font-semibold">{new Intl.NumberFormat(locale).format(metrics.total_sponsor_leads)}</p>
             </article>
           </div>
         ) : (
@@ -147,7 +147,7 @@ export default function HomePage() {
               slug={tool.slug}
               description={tool.body}
               ctaLabel={t("common.openTool")}
-              ariaLabel={`${tool.title} ${t("common.openTool")}`}
+              ariaLabel={t("common.openToolAria", { toolName: tool.title })}
             />
           ))}
         </div>
