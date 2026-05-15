@@ -27,6 +27,14 @@
 - Release and rollback procedures
 - Authenticated admin analytics with role-based access
 
+### Phase 3 Observability Baseline (Implemented)
+
+- Structured JSON backend logging with request correlation (`X-Request-ID`)
+- Request timing middleware with slow-request log events
+- Safe error summary logging (no API keys, prompts, or user PII)
+- Health diagnostics scaffold (database check, provider readiness, environment, uptime)
+- Extensible architecture prepared for future Sentry, OpenTelemetry, Prometheus, and Grafana integration
+
 ## Notes
 
 Dates and milestones will be finalized after architectural review.
