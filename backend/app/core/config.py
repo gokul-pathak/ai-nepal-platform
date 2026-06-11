@@ -14,6 +14,11 @@ class Settings(BaseSettings):
     backend_cors_origins: str = ""
     allowed_origins: str = ""
     admin_api_key: str = ""
+    
+    # Rate limiting configuration (public API abuse prevention)
+    rate_limit_enabled: bool = True
+    rate_limit_requests: int = 20  # Max requests per window
+    rate_limit_window_seconds: int = 60  # Time window in seconds
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.api.v1.dependencies import check_rate_limit
 from app.schemas.tool import ToolResponse, ToolRunRequest, ToolRunResponse, ToolRunUsageResponse
 from app.services.tool_runner import ToolRunnerService
 from app.services.tool_service import ToolService
@@ -21,6 +22,7 @@ def run_tool(
     payload: ToolRunRequest,
     x_session_id: str | None = Header(default=None, alias="X-Session-ID"),
     db: Session = Depends(get_db),
+    _: None = Depends(check_rate_limit),
 ) -> ToolRunResponse:
     if not x_session_id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="X-Session-ID header is required")

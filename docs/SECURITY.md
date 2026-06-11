@@ -5,7 +5,8 @@
 - Admin API protection: all `/api/v1/admin/*` endpoints require `X-Admin-API-Key` and return `401` for missing/invalid keys, or `503` when the admin key is not configured.
 - Public metrics data minimization: `/api/v1/metrics/public` returns aggregated counters only.
 - Input validation: tool run input is length-limited, rejects blank payloads, and blocks prompt-injection phrases.
-- Usage abuse control: free usage is capped per session with `429` response on limit exceed.
+- Session-based usage abuse control: free usage is capped per session with `429` response on limit exceed.
+- Rate limiting (public API): `/api/v1/tools/{slug}/run` is protected by in-memory sliding-window rate limiting (MVP-ready, configurable per session, Redis-ready for future upgrade).
 - Secret hygiene: `.env.example` files contain placeholders only; no real keys in source control.
 
 ## CORS Policy
@@ -13,6 +14,19 @@
 - CORS allowlist is configured via `BACKEND_CORS_ORIGINS` (comma-separated).
 - Legacy `ALLOWED_ORIGINS` is still supported for compatibility.
 - Wildcard `*` CORS is blocked when `ENVIRONMENT=production`.
+
+## Rate Limiting Policy
+
+- **Endpoint Protection**: `/api/v1/tools/{slug}/run` (public tool execution) is protected by rate limiting.
+- **Key**: Rate limit is tracked per session ID (`X-Session-ID` header).
+- **Algorithm**: Sliding window time-based rate limiting (MVP in-memory implementation).
+- **Configuration**:
+  - `RATE_LIMIT_ENABLED`: Enable/disable rate limiting (default: `true`).
+  - `RATE_LIMIT_REQUESTS`: Max requests per window (default: `20`).
+  - `RATE_LIMIT_WINDOW_SECONDS`: Time window duration (default: `60`).
+- **Response**: HTTP `429 Too Many Requests` when rate limit is exceeded.
+- **Future**: In-memory implementation is designed to swap with Redis backend without interface changes.
+- **Logging**: Rate limit events are logged with safe metadata only (session key, request count, limit), no user data.
 
 ## Logging Policy
 
@@ -34,7 +48,7 @@
 
 - `400`: invalid request inputs (for example, missing headers or blank input).
 - `401`: admin key missing or invalid on admin routes.
-- `429`: daily usage limit exceeded.
+- `429`: rate limit exceeded (public API abuse prevention) or daily usage limit exceeded.
 - `500`: generic internal server error response without sensitive details.
 
 ## Out Of Scope For MVP
