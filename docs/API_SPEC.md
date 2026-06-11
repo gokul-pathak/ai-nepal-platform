@@ -99,9 +99,23 @@ Error responses:
 - `401`: reserved for protected endpoints
 - `404`: tool not found
 - `422`: validation error (e.g., oversized input exceeding length limit, or schema validation failures)
-- `429`: daily free usage limit reached
+- `429`: rate limit exceeded (public API abuse prevention, sliding window per session)
 - `500`: internal server error
 - `502`: upstream AI provider request failed
+
+Rate limit response (HTTP 429):
+
+```json
+{
+  "detail": "Rate limit exceeded. Please try again later."
+}
+```
+
+Notes:
+- Rate limiting is applied per session ID (`X-Session-ID` header).
+- Algorithm: sliding window time-based rate limiting.
+- Default limits: 20 requests per 60 seconds (configurable via `RATE_LIMIT_REQUESTS` and `RATE_LIMIT_WINDOW_SECONDS`).
+- Rate limiting can be disabled via `RATE_LIMIT_ENABLED` environment variable.
 
 ### GET /api/v1/sponsors/packages
 
