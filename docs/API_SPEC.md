@@ -4,6 +4,7 @@
 
 - Base path: `/api/v1`
 - Content type: `application/json`
+- Response header: `X-Request-ID` is returned for request tracing
 
 ## Endpoints
 
@@ -16,9 +17,31 @@ Response:
 ```json
 {
   "status": "ok",
-  "service": "ai-nepal-platform-backend"
+  "service": "ai-nepal-platform-backend",
+  "environment": {
+    "name": "development",
+    "api_prefix": "/api/v1"
+  },
+  "checks": {
+    "database": {
+      "status": "ok"
+    },
+    "ai_provider": {
+      "status": "ok",
+      "provider": "gemini"
+    }
+  },
+  "uptime": {
+    "started_at": "2026-05-15T10:20:00.000000+00:00",
+    "uptime_seconds": 126.482
+  }
 }
 ```
+
+Notes:
+
+- `status` can be `ok` or `degraded`.
+- Diagnostic checks return safe summaries only (no secrets).
 
 ### GET /api/v1/tools
 

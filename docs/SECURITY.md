@@ -19,6 +19,16 @@
 - Never log `ADMIN_API_KEY` or request headers containing secrets.
 - Never log full tool prompts or full user input payloads.
 - Log safe error metadata only (provider name and error type), without raw prompt content.
+- API requests are logged in structured JSON format with request ID, route, status code, and duration.
+- Slow requests are logged separately for operational review.
+- Request correlation is supported via `X-Request-ID` in both request and response headers.
+
+## Observability Baseline
+
+- Request context middleware generates or propagates request IDs for all API calls.
+- Centralized middleware records timing and status for each request.
+- Health endpoint includes safe diagnostics for database connectivity and AI provider readiness.
+- Current implementation is designed for future integration with Sentry, OpenTelemetry, Prometheus, and Grafana.
 
 ## Error Response Policy
 
