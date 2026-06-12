@@ -255,8 +255,100 @@ Response example:
 }
 ```
 
+## Database Schema Overview
+
+All API endpoints read from/write to a PostgreSQL database managed by SQLAlchemy ORM and Alembic migrations.
+
+### Core Tables
+
+**tools** - Available AI tools
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | UUID | Primary key |
+| slug | String(120) | URL identifier, unique |
+| name | String(200) | Display name |
+| description | Text | Tool description |
+| category | String(120) | Tool category |
+| is_active | Boolean | Availability flag |
+| created_at, updated_at | DateTime(tz) | Audit timestamps |
+
+**tool_usage** - Tool execution tracking (for analytics and rate limiting)
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | UUID | Primary key |
+| tool_id | UUID | FK to tools.id (RESTRICT delete) |
+| session_id | String(255) | Anonymous session tracker |
+| language | String(50) | Request language (en, ne) |
+| input_tokens | Integer | Tokens sent to AI |
+| output_tokens | Integer | Tokens received from AI |
+| status | String(50) | Result status |
+| created_at, updated_at | DateTime(tz) | Timestamps |
+
+**sponsor_leads** - Sponsorship inquiries
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | UUID | Primary key |
+| organization_name | String(255) | Sponsor organization |
+| contact_name | String(255) | Contact person |
+| email | String(255) | Contact email, validated |
+| phone | String(50) | Contact phone |
+| sponsor_type | String(120) | Type of sponsorship |
+| budget_range | String(120) | Budget tier |
+| target_group | String(255) | Beneficiary group |
+| message | Text | Additional notes |
+| status | String(50) | Lead status (new, contacted, won, lost) |
+| created_at, updated_at | DateTime(tz) | Timestamps |
+
+**sponsor_packages** - Sponsorship tiers
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | UUID | Primary key |
+| name | String(255) | Package name (Bronze, Silver, Gold) |
+| slug | String(120) | URL identifier, unique |
+| monthly_request_limit | Integer | API request limit per month |
+| price_label | String(120) | Pricing display |
+| description | Text | Package details |
+| is_active | Boolean | Availability flag |
+| created_at, updated_at | DateTime(tz) | Timestamps |
+
+**admin_users** - Administrative accounts
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | UUID | Primary key |
+| email | String(255) | Login email, unique, validated |
+| password_hash | String(255) | Bcrypt hash |
+| full_name | String(255) | Display name |
+| is_active | Boolean | Account status |
+| created_at, updated_at | DateTime(tz) | Timestamps |
+
+### Data Integrity
+
+- **Foreign key constraints** with RESTRICT delete behavior prevent orphaning
+- **Check constraints** validate email format, non-empty strings, positive integers
+- **Unique constraints** on business identifiers (slug, email)
+- **Audit timestamps** on all tables (created_at, updated_at)
+
+### Performance Indexes
+
+Indexes optimize common query patterns:
+
+- **tool_usage.session_id** - Rate limit checks, daily usage counts
+- **tool_usage.tool_id** - Tool metrics aggregation
+- **tool_usage.session_id + created_at** - Time-range filtering
+- **sponsor_leads.email** - Duplicate detection, outreach
+- **sponsor_leads.status + created_at** - Lead list filtering
+- **tools.slug, sponsor_packages.slug, admin_users.email** - Unique lookups
+
+For detailed schema documentation, see `docs/DATABASE_DESIGN.md`.
+
 ## Notes
 
 - Sponsor listing and lead submission are included for MVP.
 - Basic admin/public metrics endpoints are included for MVP visibility.
 - Auth, role permissions, export reports, charts libraries, payments, and sponsor dashboard are not part of this phase.
+- Database migrations are managed via Alembic and track schema evolution.
